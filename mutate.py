@@ -68,6 +68,7 @@ class MyVisitor(ast.NodeTransformer):
         # Same, "" or 
     
     def visit_Compare(self, node):
+        print("Visitor sees a comparison operator: ", ast.dump(node), " aka ", astor.to_source(node))
         # >, >=, ==, <=, <
         # 50% chance of negating comparison operator
         num = random.randint(1, 2)
