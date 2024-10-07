@@ -128,11 +128,11 @@ class MyVisitor(ast.NodeTransformer):
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('file_name', type=str, help='The name of the file to process')
+# parser.add_argument('file_name', type=str, help='The name of the file to process')
 parser.add_argument('num_mutants', type=int, help='The number of mutants to generate')
 
 args = parser.parse_args()
-file_name = args.file_name
+# file_name = args.file_name
 num_mutants = args.num_mutants
 
 #with open(file_name, 'r') as file:
@@ -144,9 +144,9 @@ print("Code is: ", code)
 print("Code's output is:") 
 print()
 print("Applying AST transformation")
-tree = ast.parse(code)
 for i in range(num_mutants):
-    random.seed = i
+    random.seed(i)
+    tree = ast.parse(code)
     output_name = str(i) + ".py"
     tree = MyVisitor().visit(tree)
     # Add lineno & col_offset to the nodes we created
