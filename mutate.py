@@ -135,27 +135,21 @@ args = parser.parse_args()
 file_name = args.file_name
 num_mutants = args.num_mutants
 
-try:
-    with open(file_name, 'r') as file:
-        file_contents = file.read()
-        code = file_contents
-        print("Before any AST transformation")
-        print("Code is: ", code)
-        print("Code's output is:") 
-        print()
-        print("Applying AST transformation")
-        ast.parse(code)
-        for i in range(num_mutants):
-            random.seed = i
-            output_name = str(i) + ".py"
-            tree = MyVisitor().visit(tree)
-            # Add lineno & col_offset to the nodes we created
-            ast.fix_missing_locations(tree)
-            print("Transformed code is: ", astor.to_source(tree))
-            with open(output_name, 'w') as outputFile:
-                outputFile.write(astor.to_source(tree))
-            
-except FileNotFoundError:
-    print(f"Error: The file '{file_name}' does not exist.")
-except Exception as e:
-    print(f"An error occurred: {e}")
+with open(file_name, 'r') as file:
+    file_contents = file.read()
+    code = file_contents
+    print("Before any AST transformation")
+    print("Code is: ", code)
+    print("Code's output is:") 
+    print()
+    print("Applying AST transformation")
+    tree = ast.parse(code)
+    for i in range(num_mutants):
+        random.seed = i
+        output_name = str(i) + ".py"
+        tree = MyVisitor().visit(tree)
+        # Add lineno & col_offset to the nodes we created
+        ast.fix_missing_locations(tree)
+        print("Transformed code is: ", astor.to_source(tree))
+        with open(output_name, 'w') as outputFile:
+            outputFile.write(astor.to_source(tree))
