@@ -60,9 +60,9 @@ class MyVisitor(ast.NodeTransformer):
         
         num = random.randint(1,3)
         if num == 1:
-            return ast.Num(value="", kind=None)
+            return ast.Str(value="", kind=None)
         elif num == 2:
-            return ast.Num(value=node.value[1:], kind=None)
+            return ast.Str(value=node.s[1:], kind=None)
         else:
             return node
         # Same, "" or 
