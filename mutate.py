@@ -74,18 +74,25 @@ class MyVisitor(ast.NodeTransformer):
         num = random.randint(1, 2)
         if num == 1:
             if isinstance(node.ops[0], ast.Lt()):
+                print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.GtE()], comparators=node.comparators) ))
                 return ast.Compare(left=node.left, ops=[ast.GtE()], comparators=node.comparators)
             elif isinstance(node.ops[0], ast.LtE()):
+                print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.Gt()], comparators=node.comparators) ))
                 return ast.Compare(left=node.left, ops=[ast.Gt()], comparators=node.comparators)
             elif isinstance(node.ops[0], ast.Gt()):
+                print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.LtE()], comparators=node.comparators)))
                 return ast.Compare(left=node.left, ops=[ast.LtE()], comparators=node.comparators)
             elif isinstance(node.ops[0], ast.GtE()):
+                print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.Lt()], comparators=node.comparators)))
                 return ast.Compare(left=node.left, ops=[ast.Lt()], comparators=node.comparators)
             elif isinstance(node.ops[0], ast.Eq()):
+                print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.NotEq()], comparators=node.comparators)))
                 return ast.Compare(left=node.left, ops=[ast.NotEq()], comparators=node.comparators)
             elif isinstance(node.ops[0], ast.NotEq()):
+                print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.Eq()], comparators=node.comparators)))
                 return ast.Compare(left=node.left, ops=[ast.Eq()], comparators=node.comparators)
         else:
+            print("OldNode: ", astor.to_source(node))
             return node
         return node
     
@@ -119,13 +126,13 @@ class MyVisitor(ast.NodeTransformer):
             return node
         return node
     
-    def visit_Expr(self, node):
-    # implement 25% chance of deleting, 75% lea
-        num = random.randint(1,4)
-        if isinstance(node.value, ast.Call) and num == 1:
-            print("Visitor sees a function call: ", ast.dump(node), " aka ", astor.to_source(node))
-            return None  # Deleting function call
-        return node
+    # def visit_Expr(self, node):
+    # # implement 25% chance of deleting, 75% lea
+    #     num = random.randint(1,4)
+    #     if isinstance(node.value, ast.Call) and num == 1:
+    #         print("Visitor sees a function call: ", ast.dump(node), " aka ", astor.to_source(node))
+    #         return None  # Deleting function call
+    #     return node
 
 parser = argparse.ArgumentParser()
 
