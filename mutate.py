@@ -138,7 +138,7 @@ num_mutants = args.num_mutants
 #with open(file_name, 'r') as file:
 #   file_contents = file.read()
 #   code = file_contents
-code = "# a = 10; b = 20; c = 'Hello'; d = 'World'; is_equal = a == b; is_not_equal = a != b; is_greater = a > b; is_less = a < b; is_greater_equal = a >= b; is_less_equal = a <= b; sum_result = a + b; difference = b - a; product = a * b; quotient = b / a; floor_division = b // a; remainder = b % a; is_a_greater_or_equal = a >= 10; is_b_less_and_a_equal = b < 25 and a == 10; is_c_or_d = c == 'Hello' or d == 'Python'; print('Comparison Results:'); print('Is Equal:', is_equal); print('Is Not Equal:', is_not_equal); print('Is Greater:', is_greater); print('Is Less:', is_less); print('Is Greater or Equal:', is_greater_equal); print('Is Less or Equal:', is_less_equal); print('\\nBinary Operation Results:'); print('Sum:', sum_result); print('Difference:', difference); print('Product:', product); print('Quotient:', quotient); print('Floor Division:', floor_division); print('Remainder:', remainder); print('\\nBoolean Operation Results:'); print('Is A Greater or Equal to 10:', is_a_greater_or_equal); print('Is B Less than 25 and A Equal to 10:', is_b_less_and_a_equal); print('Is C or D:', is_c_or_d)"
+code = "a = 10; b = 20; c = 'Hello'; d = 'World'; is_equal = a > b; "
 print("Before any AST transformation")
 print("Code is: ", code)
 print("Code's output is:") 
@@ -151,6 +151,6 @@ for i in range(num_mutants):
     tree = MyVisitor().visit(tree)
     # Add lineno & col_offset to the nodes we created
     ast.fix_missing_locations(tree)
-    # print("Transformed code is: ", astor.to_source(tree))
+    print("Transformed code is: ", astor.to_source(tree))
     with open(output_name, 'w') as outputFile:
         outputFile.write(astor.to_source(tree))
