@@ -28,12 +28,12 @@ import argparse
 
 class MyVisitor(ast.NodeTransformer):
 
-    num_count = 0
-    str_count = 0
-    compare_count = 0
-    binOp_count = 0
-    boolOp_count = 0
-    expr_count = 0
+    def __init__(self):
+        self.num_count = 0
+        self.str_count = 0
+        self.compare_count = 0
+        self.binOp_count = 0
+        self.boolOp_count = 0
 
     """Notes all Numbers and all Strings. Replaces all numbers with 481 and
     strings with 'SE'."""
@@ -52,12 +52,12 @@ class MyVisitor(ast.NodeTransformer):
         # Note: some students may want: return ast.Num(n=481) 
         
         # 0, -1, 1, or same
-        num_count += 1
-        if num_count % 4 == 1:
+        self.num_count += 1
+        if self.num_count % 4 == 1:
             return ast.Num(n=0)
-        elif num_count % 4 == 2:
+        elif self.num_count % 4 == 2:
             return ast.Num(n=-1)
-        elif num_count % 4 == 3:
+        elif self.num_count % 4 == 3:
             return ast.Num(n=1)
         else:
             return node
@@ -67,10 +67,10 @@ class MyVisitor(ast.NodeTransformer):
         print("Visitor sees a string: ", ast.dump(node), " aka ", astor.to_source(node))
         # Note: some students may want: return ast.Str(s=481)
         
-        str_count += 1
-        if str_count % 3 == 1:
+        self.str_count += 1
+        if self.str_count % 3 == 1:
             return ast.Str(s="")
-        elif str_count % 3 == 2:
+        elif self.str_count % 3 == 2:
             return ast.Str(s=node.s[1:])
         else:
             return node
@@ -103,40 +103,37 @@ class MyVisitor(ast.NodeTransformer):
         # else:
         #     print("OldNode: ", astor.to_source(node))
         #     return node
-        compare_count += 1
+        self.compare_count += 1
         return ast.Compare(left=node.left, ops=[ast.Eq()], comparators=node.comparators)
     
     def visit_BinOp(self, node):
         print("Visitor sees a binary operator: ", ast.dump(node), " aka ", astor.to_source(node))
         # + to -, * to //, + to *, - to //, leave the same 
-        if isinstance(node.op, ast.Add):  # If the operation is "+"
-            choices = [ast.Sub(), ast.Mult(), ast.Add()]  # -, *, +
-        elif isinstance(node.op, ast.Sub):  # If the operation is "-"
-            choices = [ast.Add(), ast.FloorDiv(), ast.Sub()]  # +, //, -
-        elif isinstance(node.op, ast.Mult):  # If the operation is "*"
-            choices = [ast.FloorDiv(), ast.Add(), ast.Mult()]  # //, +, *
-        elif isinstance(node.op, ast.FloorDiv):  # If the operation is "//"
-            choices = [ast.Sub(), ast.Mult(), ast.FloorDiv()]  # -, *, //
+        self.binOp_count += 1
+        if isinstance(node.op, ast.Add):
+            choices = [ast.Sub(), ast.Mult(), ast.Add()]
+        elif isinstance(node.op, ast.Sub):
+            choices = [ast.Add(), ast.FloorDiv(), ast.Sub()]
+        elif isinstance(node.op, ast.Mult):
+            choices = [ast.FloorDiv(), ast.Add(), ast.Mult()]
+        elif isinstance(node.op, ast.FloorDiv):
+            choices = [ast.Sub(), ast.Mult(), ast.FloorDiv()]
         else:
-            return node  # If it's not one of the above, return the node unchanged
+            return node  # If not one of the above, return unchanged
         
-        # Randomly select one of the choices with equal probability
         newOp = random.choice(choices)
-        
-        binOp_count += 1
         return ast.BinOp(left=node.left, op=newOp, right=node.right)
     
     def visit_BoolOp(self, node):
         print("Visitor sees a boolean operator: ", ast.dump(node), " aka ", astor.to_source(node))
         # 50% chance of negating boolean statement, 50% chance of leaving statement alone
+        self.boolOp_count += 1
         num = random.randint(1, 2)
         if num == 1:
             if isinstance(node.op, ast.And):
                 return ast.BoolOp(op=ast.Or(), values=node.values)
             elif isinstance(node.op, ast.Or):
                 return ast.BoolOp(op=ast.And(), values=node.values)
-        else:
-            return node
         return node
     
     # def visit_Expr(self, node):
