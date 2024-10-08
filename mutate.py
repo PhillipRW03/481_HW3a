@@ -136,17 +136,17 @@ class MyVisitor(ast.NodeTransformer):
 
 parser = argparse.ArgumentParser()
 
-# parser.add_argument('file_name', type=str, help='The name of the file to process')
+parser.add_argument('file_name', type=str, help='The name of the file to process')
 parser.add_argument('num_mutants', type=int, help='The number of mutants to generate')
 
 args = parser.parse_args()
-# file_name = args.file_name
+file_name = args.file_name
 num_mutants = args.num_mutants
 
-#with open(file_name, 'r') as file:
-#   file_contents = file.read()
-#   code = file_contents
-code = "a = 10; b = 20; c = 'Hello'; d = 'World'; is_equal = a > b; "
+with open(file_name, 'r') as file:
+   file_contents = file.read()
+   code = file_contents
+# code = "a = 10; b = 20; c = 'Hello'; d = 'World'; is_equal = a > b; "
 print("Before any AST transformation")
 print("Code is: ", code)
 print("Code's output is:") 
