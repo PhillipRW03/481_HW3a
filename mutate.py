@@ -54,7 +54,7 @@ class MyVisitor(ast.NodeTransformer):
         
         # 0, -1, 1, or same
         self.num_count += 1
-        if self.total_mutations >= 2:
+        if self.total_mutations >= 4:
             return node
         num = random.randint(1,10)
         if num == 1:
@@ -72,7 +72,8 @@ class MyVisitor(ast.NodeTransformer):
     def visit_Str(self, node):
         print("Visitor sees a string: ", ast.dump(node), " aka ", astor.to_source(node))
         # Note: some students may want: return ast.Str(s=481)
-        
+        if self.total_mutations >= 4:
+            return node
         self.str_count += 1
         num = random.randint(1,10)
         if num == 1:
@@ -90,23 +91,38 @@ class MyVisitor(ast.NodeTransformer):
         # >, >=, ==, <=, <
         # 50% chance of negating comparison operator
         self.compare_count += 1
-        if self.total_mutations >= 2:
+    
+        if self.total_mutations >= 4:
             return node
-        num = random.randint(1,10)
+        
+        # Randomly decide if a mutation should be applied
+        num = random.randint(1, 10)
         if num == 1:
             self.total_mutations += 1
+
+            # Make sure the comparison operators are valid and replace them
             if isinstance(node.ops[0], ast.Lt):
-                return ast.Compare(left=node.left, ops=[ast.GtE()], comparators=node.comparators)
+                new_op = ast.GtE()
             elif isinstance(node.ops[0], ast.LtE):
-                return ast.Compare(left=node.left, ops=[ast.Gt()], comparators=node.comparators)
+                new_op = ast.Gt()
             elif isinstance(node.ops[0], ast.Gt):
-                return ast.Compare(left=node.left, ops=[ast.LtE()], comparators=node.comparators)
+                new_op = ast.LtE()
             elif isinstance(node.ops[0], ast.GtE):
-                return ast.Compare(left=node.left, ops=[ast.Lt()], comparators=node.comparators)
+                new_op = ast.Lt()
             elif isinstance(node.ops[0], ast.Eq):
-                return ast.Compare(left=node.left, ops=[ast.NotEq()], comparators=node.comparators)
+                new_op = ast.NotEq()
             elif isinstance(node.ops[0], ast.NotEq):
-                return ast.Compare(left=node.left, ops=[ast.Eq()], comparators=node.comparators)
+                new_op = ast.Eq()
+            else:
+                # If it's an unrecognized operator, return the node unmodified
+                return node
+            
+            # Construct a new Compare node, preserving the left, comparators, and replacing the ops
+            new_node = ast.Compare(left=node.left, ops=[new_op], comparators=node.comparators)
+
+            # Fix the locations in the new node to ensure it has proper attributes like `lineno` and `col_offset`
+            ast.fix_missing_locations(new_node)
+            return new_node
         else:
             return node
 
@@ -116,7 +132,7 @@ class MyVisitor(ast.NodeTransformer):
         # + to -, * to //, + to *, - to //, leave the same 
         
         self.binOp_count += 1
-        if self.total_mutations >= 2:
+        if self.total_mutations >= 4:
             return node
         
         num = random.randint(1,10)
@@ -141,6 +157,9 @@ class MyVisitor(ast.NodeTransformer):
         print("Visitor sees a boolean operator: ", ast.dump(node), " aka ", astor.to_source(node))
         # 50% chance of negating boolean statement, 50% chance of leaving statement alone
         self.boolOp_count += 1
+
+        if self.total_mutations >= 4:
+            return node
         num = random.randint(1, 10)
         if num == 1:
             self.total_mutations += 1
