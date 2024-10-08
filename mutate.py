@@ -169,13 +169,41 @@ class MyVisitor(ast.NodeTransformer):
                 return ast.BoolOp(op=ast.And(), values=node.values)
         return node
     
-    # def visit_Expr(self, node):
-    # # implement 25% chance of deleting, 75% lea
-    #     num = random.randint(1,4)
-    #     if isinstance(node.value, ast.Call) and num == 1:
-    #         print("Visitor sees a function call: ", ast.dump(node), " aka ", astor.to_source(node))
-    #         return None  # Deleting function call
-    #     return node
+    def visit_Assign(self, node):
+        print("Visitor sees an assignment: ", ast.dump(node), " aka ", astor.to_source(node))
+        if self.total_mutations >= 4:
+            return node
+        
+        # Check if this assignment is inside a block (like an if/for/while) and if it's the only statement
+        parent = getattr(node, 'parent', None)  # You can track parent nodes if needed
+        if parent and isinstance(parent, (ast.If, ast.While, ast.For)) and len(parent.body) == 1:
+            return node  # Skip deletion if it's the only statement in an 'if' block
+        
+        # Randomly decide if the assignment should be deleted
+        if random.randint(1, 10) == 1:  # 10% chance to delete
+            self.total_mutations += 1
+            return None  # This deletes the assignment
+        return node
+
+
+    def visit_Expr(self, node):
+        # Handle function calls, which are expressions without being part of an assignment
+
+        if self.total_mutations >= 4:
+            return node
+        
+        if isinstance(node.value, ast.Call):
+            print("Visitor sees a function call: ", ast.dump(node), " aka ", astor.to_source(node))
+            
+            # Randomly decide if the function call should be deleted
+            if random.randint(1, 10) == 1:  # 10% chance to delete
+                self.total_mutations += 1
+                # Ensure it's safe to delete (e.g., not leaving an empty block)
+                parent = getattr(node, 'parent', None)  # Check the parent context if necessary
+                if parent and isinstance(parent, (ast.If, ast.While, ast.For)) and len(parent.body) == 1:
+                    return node  # Don't delete if it's the only statement in a block
+                return None  # This deletes the function call
+        return node
 
 parser = argparse.ArgumentParser()
 
