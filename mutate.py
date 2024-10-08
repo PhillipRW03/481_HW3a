@@ -44,7 +44,7 @@ class MyVisitor(ast.NodeTransformer):
     # these visit_Num() functions and the like, which are called
     # automatically for us by the library. 
     def visit_Num(self, node):
-        print("Visitor sees a number: ", ast.dump(node), " aka ", astor.to_source(node))
+        # print("Visitor sees a number: ", ast.dump(node), " aka ", astor.to_source(node))
         # Note how we never say "node.contents = 481" or anything like
         # that. We do not directly assign to nodes. Intead, the Visitor
         # Pattern hides that information from us. We use the return value
@@ -70,7 +70,7 @@ class MyVisitor(ast.NodeTransformer):
         
 
     def visit_Str(self, node):
-        print("Visitor sees a string: ", ast.dump(node), " aka ", astor.to_source(node))
+        # print("Visitor sees a string: ", ast.dump(node), " aka ", astor.to_source(node))
         # Note: some students may want: return ast.Str(s=481)
         if self.total_mutations >= 4:
             return node
@@ -87,7 +87,7 @@ class MyVisitor(ast.NodeTransformer):
         # Same, "" or 
     
     def visit_Compare(self, node):
-        print("Visitor sees a comparison operator: ", ast.dump(node), " aka ", astor.to_source(node))
+        # print("Visitor sees a comparison operator: ", ast.dump(node), " aka ", astor.to_source(node))
         # >, >=, ==, <=, <
         # 50% chance of negating comparison operator
         self.compare_count += 1
@@ -128,7 +128,7 @@ class MyVisitor(ast.NodeTransformer):
 
     
     def visit_BinOp(self, node):
-        print("Visitor sees a binary operator: ", ast.dump(node), " aka ", astor.to_source(node))
+        # print("Visitor sees a binary operator: ", ast.dump(node), " aka ", astor.to_source(node))
         # + to -, * to //, + to *, - to //, leave the same 
         
         self.binOp_count += 1
@@ -154,7 +154,7 @@ class MyVisitor(ast.NodeTransformer):
             return node
     
     def visit_BoolOp(self, node):
-        print("Visitor sees a boolean operator: ", ast.dump(node), " aka ", astor.to_source(node))
+        # print("Visitor sees a boolean operator: ", ast.dump(node), " aka ", astor.to_source(node))
         # 50% chance of negating boolean statement, 50% chance of leaving statement alone
         self.boolOp_count += 1
 
@@ -170,7 +170,7 @@ class MyVisitor(ast.NodeTransformer):
         return node
     
     def visit_Assign(self, node):
-        print("Visitor sees an assignment: ", ast.dump(node), " aka ", astor.to_source(node))
+        # print("Visitor sees an assignment: ", ast.dump(node), " aka ", astor.to_source(node))
         if self.total_mutations >= 2:
             return node
         
