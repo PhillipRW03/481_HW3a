@@ -44,57 +44,59 @@ class MyVisitor(ast.NodeTransformer):
         # Note: some students may want: return ast.Num(n=481) 
         
         # 0, -1, 1, or same
-        num = random.randint(1,4)
-        if num == 1:
-            return ast.Num(value=0, kind=None)
-        elif num == 2:
-            return ast.Num(value=-1, kind=None)
-        elif num == 3:
-            return ast.Num(value=1, kind=None)
-        else:
-            return node
+        # num = random.randint(1,4)
+        # if num == 1:
+        #     return ast.Num(value=0, kind=None)
+        # elif num == 2:
+        #     return ast.Num(value=-1, kind=None)
+        # elif num == 3:
+        #     return ast.Num(value=1, kind=None)
+        # else:
+        #     return node
+        return ast.Num(n=1)
 
     def visit_Str(self, node):
         print("Visitor sees a string: ", ast.dump(node), " aka ", astor.to_source(node))
         # Note: some students may want: return ast.Str(s=481)
         
-        num = random.randint(1,3)
-        if num == 1:
-            return ast.Str(value="", kind=None)
-        elif num == 2:
-            return ast.Str(value=node.s[1:], kind=None)
-        else:
-            return node
+        # num = random.randint(1,3)
+        # if num == 1:
+        #     return ast.Str(value="", kind=None)
+        # elif num == 2:
+        #     return ast.Str(value=node.s[1:], kind=None)
+        # else:
+        #     return node
         # Same, "" or 
+        return ast.Str(s='this')
     
     def visit_Compare(self, node):
         print("Visitor sees a comparison operator: ", ast.dump(node), " aka ", astor.to_source(node))
         # >, >=, ==, <=, <
         # 50% chance of negating comparison operator
-        num = random.randint(1, 2)
-        if num == 1:
-            if isinstance(node.ops[0], ast.Lt()):
-                print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.GtE()], comparators=node.comparators) ))
-                return ast.Compare(left=node.left, ops=[ast.GtE()], comparators=node.comparators)
-            elif isinstance(node.ops[0], ast.LtE()):
-                print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.Gt()], comparators=node.comparators) ))
-                return ast.Compare(left=node.left, ops=[ast.Gt()], comparators=node.comparators)
-            elif isinstance(node.ops[0], ast.Gt()):
-                print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.LtE()], comparators=node.comparators)))
-                return ast.Compare(left=node.left, ops=[ast.LtE()], comparators=node.comparators)
-            elif isinstance(node.ops[0], ast.GtE()):
-                print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.Lt()], comparators=node.comparators)))
-                return ast.Compare(left=node.left, ops=[ast.Lt()], comparators=node.comparators)
-            elif isinstance(node.ops[0], ast.Eq()):
-                print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.NotEq()], comparators=node.comparators)))
-                return ast.Compare(left=node.left, ops=[ast.NotEq()], comparators=node.comparators)
-            elif isinstance(node.ops[0], ast.NotEq()):
-                print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.Eq()], comparators=node.comparators)))
-                return ast.Compare(left=node.left, ops=[ast.Eq()], comparators=node.comparators)
-        else:
-            print("OldNode: ", astor.to_source(node))
-            return node
-        return node
+        # num = random.randint(1, 2)
+        # if num == 1:
+        #     if isinstance(node.ops[0], ast.Lt()):
+        #         print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.GtE()], comparators=node.comparators) ))
+        #         return ast.Compare(left=node.left, ops=[ast.GtE()], comparators=node.comparators)
+        #     elif isinstance(node.ops[0], ast.LtE()):
+        #         print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.Gt()], comparators=node.comparators) ))
+        #         return ast.Compare(left=node.left, ops=[ast.Gt()], comparators=node.comparators)
+        #     elif isinstance(node.ops[0], ast.Gt()):
+        #         print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.LtE()], comparators=node.comparators)))
+        #         return ast.Compare(left=node.left, ops=[ast.LtE()], comparators=node.comparators)
+        #     elif isinstance(node.ops[0], ast.GtE()):
+        #         print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.Lt()], comparators=node.comparators)))
+        #         return ast.Compare(left=node.left, ops=[ast.Lt()], comparators=node.comparators)
+        #     elif isinstance(node.ops[0], ast.Eq()):
+        #         print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.NotEq()], comparators=node.comparators)))
+        #         return ast.Compare(left=node.left, ops=[ast.NotEq()], comparators=node.comparators)
+        #     elif isinstance(node.ops[0], ast.NotEq()):
+        #         print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.Eq()], comparators=node.comparators)))
+        #         return ast.Compare(left=node.left, ops=[ast.Eq()], comparators=node.comparators)
+        # else:
+        #     print("OldNode: ", astor.to_source(node))
+        #     return node
+        return ast.Compare(left=node.left, ops=[ast.Eq()], comparators=node.comparators)
     
     def visit_BinOp(self, node):
         print("Visitor sees a binary operator: ", ast.dump(node), " aka ", astor.to_source(node))
@@ -161,7 +163,7 @@ for i in range(num_mutants):
     tree = MyVisitor().visit(tree)
     # Add lineno & col_offset to the nodes we created
     ast.fix_missing_locations(tree)
-    ast.dump(tree)
+    print(ast.dump(tree))
     print("Transformed code is: ", astor.to_source(tree))
     with open(output_name, 'w') as outputFile:
         outputFile.write(astor.to_source(tree))
