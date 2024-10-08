@@ -97,6 +97,7 @@ class MyVisitor(ast.NodeTransformer):
         return node
     
     def visit_BinOp(self, node):
+        print("Visitor sees a binary operator: ", ast.dump(node), " aka ", astor.to_source(node))
         # + to -, * to //, + to *, - to //, leave the same 
         if isinstance(node.op, ast.Add):  # If the operation is "+"
             choices = [ast.Sub(), ast.Mult(), ast.Add()]  # -, *, +
@@ -115,6 +116,7 @@ class MyVisitor(ast.NodeTransformer):
         return ast.BinOp(left=node.left, op=newOp, right=node.right)
     
     def visit_BoolOp(self, node):
+        print("Visitor sees a boolean operator: ", ast.dump(node), " aka ", astor.to_source(node))
         # 50% chance of negating boolean statement, 50% chance of leaving statement alone
         num = random.randint(1, 2)
         if num == 1:
@@ -159,6 +161,7 @@ for i in range(num_mutants):
     tree = MyVisitor().visit(tree)
     # Add lineno & col_offset to the nodes we created
     ast.fix_missing_locations(tree)
+    ast.dump(tree)
     print("Transformed code is: ", astor.to_source(tree))
     with open(output_name, 'w') as outputFile:
         outputFile.write(astor.to_source(tree))
