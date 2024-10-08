@@ -35,6 +35,8 @@ class MyVisitor(ast.NodeTransformer):
         self.binOp_count = 0
         self.boolOp_count = 0
         self.total_mutations = 0
+        self.binarySwap_count = 0
+        self.binaryNegation_count = 0
 
     """Notes all Numbers and all Strings. Replaces all numbers with 481 and
     strings with 'SE'."""
@@ -92,7 +94,7 @@ class MyVisitor(ast.NodeTransformer):
         # 50% chance of negating comparison operator
         self.compare_count += 1
     
-        if self.total_mutations >= 4:
+        if self.total_mutations >= 6:
             return node
         
         # Randomly decide if a mutation should be applied
@@ -102,17 +104,17 @@ class MyVisitor(ast.NodeTransformer):
 
             # Make sure the comparison operators are valid and replace them
             if isinstance(node.ops[0], ast.Lt):
-                new_op = ast.GtE()
+                new_op = random.choice([ast.GtE(), ast.LtE(), ast.Gt(), ast.Eq(), ast.NotEq()])
             elif isinstance(node.ops[0], ast.LtE):
-                new_op = ast.Gt()
+                new_op = random.choice([ast.GtE(), ast.Lt(), ast.Gt(), ast.Eq(), ast.NotEq()])
             elif isinstance(node.ops[0], ast.Gt):
-                new_op = ast.LtE()
+                new_op = random.choice([ast.LtE(), ast.Lt(), ast.GtE(), ast.Eq(), ast.NotEq()])
             elif isinstance(node.ops[0], ast.GtE):
-                new_op = ast.Lt()
+                new_op = random.choice([ast.LtE(), ast.Lt(), ast.Gt(), ast.Eq(), ast.NotEq()])
             elif isinstance(node.ops[0], ast.Eq):
-                new_op = ast.NotEq()
+                new_op = random.choice([ast.GtE(), ast.Lt(), ast.Gt(), ast.NotEq(), ast.LtE()])
             elif isinstance(node.ops[0], ast.NotEq):
-                new_op = ast.Eq()
+                new_op = random.choice([ast.GtE(), ast.Lt(), ast.Gt(), ast.Eq(), ast.LtE()])
             else:
                 # If it's an unrecognized operator, return the node unmodified
                 return node
@@ -132,22 +134,64 @@ class MyVisitor(ast.NodeTransformer):
         # + to -, * to //, + to *, - to //, leave the same 
         
         self.binOp_count += 1
-        if self.total_mutations >= 4:
+        if self.total_mutations >= 8:
             return node
         
+        
         num = random.randint(1,10)
+        num2 = random.randint(1,2)
         if num == 1:
             if isinstance(node.op, ast.Add):
+                if num2 == 1:
+                    if self.binaryNegation_count >= 2:
+                        return node
+                    self.binaryNegation_count += 1
+                    # negate operation
+                else:
+                    if self.binarySwap_count >= 2:
+                        return node
+                    self.binarySwap_count += 1
+                    # swap operation
                 choices = [ast.Sub(), ast.Mult()]
             elif isinstance(node.op, ast.Sub):
+                if num2 == 1:
+                    if self.binaryNegation_count >= 2:
+                        return node
+                    self.binaryNegation_count += 1
+                    # negate operation
+                else:
+                    if self.binarySwap_count >= 2:
+                        return node
+                    self.binarySwap_count += 1
+                    # swap operation
                 choices = [ast.Add(), ast.FloorDiv()]
             elif isinstance(node.op, ast.Mult):
+                if num2 == 1:
+                    if self.binaryNegation_count >= 2:
+                        return node
+                    self.binaryNegation_count += 1
+                    # negate operation
+                else:
+                    if self.binarySwap_count >= 2:
+                        return node
+                    self.binarySwap_count += 1
+                    # swap operation
                 choices = [ast.FloorDiv(), ast.Add()]
             elif isinstance(node.op, ast.FloorDiv):
-                choices = [ast.Sub(), ast.Mult()]
+                if num2 == 1:
+                    if self.binaryNegation_count >= 2:
+                        return node
+                    self.binaryNegation_count += 1
+                    # negate operation
+                else:
+                    if self.binarySwap_count >= 2:
+                        return node
+                    self.binarySwap_count += 1
+                    # swap operation
+                choices = [ast.Mult(), ast.Sub()]
             else:
                 return node  # If not one of the above, return unchanged
-            newOp = random.choice(choices)
+            newOp = choices[num2-1]
             self.total_mutations += 1
             return ast.BinOp(left=node.left, op=newOp, right=node.right)
         else:
@@ -160,7 +204,7 @@ class MyVisitor(ast.NodeTransformer):
 
         if self.total_mutations >= 4:
             return node
-        num = random.randint(1, 10)
+        num = random.randint(1, 5)
         if num == 1:
             self.total_mutations += 1
             if isinstance(node.op, ast.And):
@@ -171,7 +215,7 @@ class MyVisitor(ast.NodeTransformer):
     
     def visit_Assign(self, node):
         # print("Visitor sees an assignment: ", ast.dump(node), " aka ", astor.to_source(node))
-        if self.total_mutations >= 2:
+        if self.total_mutations >= 4:
             return node
         
         # Check if this assignment is inside a block (like an if/for/while) and if it's the only statement
@@ -180,7 +224,7 @@ class MyVisitor(ast.NodeTransformer):
             return node  # Skip deletion if it's the only statement in an 'if' block
         
         # Randomly decide if the assignment should be deleted
-        if random.randint(1, 10) == 1:  # 10% chance to delete
+        if random.randint(1, 100) == 1:  # 20% chance to delete
             self.total_mutations += 1
             return None  # This deletes the assignment
         return node
@@ -189,14 +233,14 @@ class MyVisitor(ast.NodeTransformer):
     def visit_Expr(self, node):
         # Handle function calls, which are expressions without being part of an assignment
 
-        if self.total_mutations >= 2:
+        if self.total_mutations >= 4:
             return node
         
         if isinstance(node.value, ast.Call):
-            print("Visitor sees a function call: ", ast.dump(node), " aka ", astor.to_source(node))
+            # print("Visitor sees a function call: ", ast.dump(node), " aka ", astor.to_source(node))
             
             # Randomly decide if the function call should be deleted
-            if random.randint(1, 10) == 1:  # 10% chance to delete
+            if random.randint(1, 100) == 1:  # 20% chance to delete
                 self.total_mutations += 1
                 # Ensure it's safe to delete (e.g., not leaving an empty block)
                 parent = getattr(node, 'parent', None)  # Check the parent context if necessary
@@ -218,11 +262,11 @@ with open(file_name, 'r') as file:
    file_contents = file.read()
    code = file_contents
 # code = "a = 10; b = 20; c = 'Hello'; d = 'World'; is_equal = a > b; "
-print("Before any AST transformation")
-print("Code is: ", code)
-print("Code's output is:") 
-print()
-print("Applying AST transformation")
+# print("Before any AST transformation")
+# print("Code is: ", code)
+# print("Code's output is:") 
+# print()
+# print("Applying AST transformation")
 for i in range(num_mutants):
     random.seed(i)
     tree = ast.parse(code)
@@ -230,6 +274,6 @@ for i in range(num_mutants):
     tree = MyVisitor().visit(tree)
     # Add lineno & col_offset to the nodes we created
     ast.fix_missing_locations(tree)
-    print("Transformed code is: ", astor.to_source(tree))
+    # print("Transformed code is: ", astor.to_source(tree))
     with open(output_name, 'w') as outputFile:
         outputFile.write(astor.to_source(tree))
