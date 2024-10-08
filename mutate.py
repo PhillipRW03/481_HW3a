@@ -102,17 +102,17 @@ class MyVisitor(ast.NodeTransformer):
         num = random.randint(1,10)
         if num == 1:
             self.total_mutations += 1
-            if isinstance(node.ops[0], ast.Lt()):
+            if isinstance(node.ops[0], ast.Lt):
                 return ast.Compare(left=node.left, ops=[ast.GtE()], comparators=node.comparators)
-            elif isinstance(node.ops[0], ast.LtE()):
+            elif isinstance(node.ops[0], ast.LtE):
                 return ast.Compare(left=node.left, ops=[ast.Gt()], comparators=node.comparators)
-            elif isinstance(node.ops[0], ast.Gt()):
+            elif isinstance(node.ops[0], ast.Gt):
                 return ast.Compare(left=node.left, ops=[ast.LtE()], comparators=node.comparators)
-            elif isinstance(node.ops[0], ast.GtE()):
+            elif isinstance(node.ops[0], ast.GtE):
                 return ast.Compare(left=node.left, ops=[ast.Lt()], comparators=node.comparators)
-            elif isinstance(node.ops[0], ast.Eq()):
+            elif isinstance(node.ops[0], ast.Eq):
                 return ast.Compare(left=node.left, ops=[ast.NotEq()], comparators=node.comparators)
-            elif isinstance(node.ops[0], ast.NotEq()):
+            elif isinstance(node.ops[0], ast.NotEq):
                 return ast.Compare(left=node.left, ops=[ast.Eq()], comparators=node.comparators)
         else:
             return node
