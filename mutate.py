@@ -54,7 +54,7 @@ class MyVisitor(ast.NodeTransformer):
         
         # 0, -1, 1, or same
         self.num_count += 1
-        if self.total_mutations >= 8:
+        if self.total_mutations >= 4:
             return node
         num = random.randint(1,10)
         if num == 1:
@@ -72,7 +72,7 @@ class MyVisitor(ast.NodeTransformer):
     def visit_Str(self, node):
         print("Visitor sees a string: ", ast.dump(node), " aka ", astor.to_source(node))
         # Note: some students may want: return ast.Str(s=481)
-        if self.total_mutations >= 8:
+        if self.total_mutations >= 4:
             return node
         self.str_count += 1
         num = random.randint(1,10)
