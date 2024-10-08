@@ -58,17 +58,15 @@ class MyVisitor(ast.NodeTransformer):
             return node
         num = random.randint(1,10)
         if num == 1:
-            if self.num_count % 4 == 1:
+            if self.num_count % 3 == 1:
                 self.total_mutations += 1
                 return ast.Num(n=0)
-            elif self.num_count % 4 == 2:
+            elif self.num_count % 3 == 2:
                 self.total_mutations += 1
                 return ast.Num(n=-1)
-            elif self.num_count % 4 == 3:
+            else:
                 self.total_mutations += 1
                 return ast.Num(n=1)
-            else:
-                return node
         else:
             return node
         
@@ -80,14 +78,12 @@ class MyVisitor(ast.NodeTransformer):
         self.str_count += 1
         num = random.randint(1,10)
         if num == 1:
-            if self.str_count % 3 == 1:
+            if self.str_count % 2 == 1:
                 self.total_mutations += 1
                 return ast.Str(s="")
-            elif self.str_count % 3 == 2:
+            else:
                 self.total_mutations += 1
                 return ast.Str(s=node.s[1:])
-            else:
-                return node
         else: 
             return node
         # Same, "" or 
