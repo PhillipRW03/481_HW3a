@@ -27,6 +27,14 @@ import argparse
 
 
 class MyVisitor(ast.NodeTransformer):
+
+    num_count = 0
+    str_count = 0
+    compare_count = 0
+    binOp_count = 0
+    boolOp_count = 0
+    expr_count = 0
+
     """Notes all Numbers and all Strings. Replaces all numbers with 481 and
     strings with 'SE'."""
     # each function has a random chance of 
@@ -44,30 +52,29 @@ class MyVisitor(ast.NodeTransformer):
         # Note: some students may want: return ast.Num(n=481) 
         
         # 0, -1, 1, or same
-        # num = random.randint(1,4)
-        # if num == 1:
-        #     return ast.Num(value=0, kind=None)
-        # elif num == 2:
-        #     return ast.Num(value=-1, kind=None)
-        # elif num == 3:
-        #     return ast.Num(value=1, kind=None)
-        # else:
-        #     return node
-        return ast.Num(n=1)
+        num_count += 1
+        if num_count % 4 == 1:
+            return ast.Num(n=0)
+        elif num_count % 4 == 2:
+            return ast.Num(n=-1)
+        elif num_count % 4 == 3:
+            return ast.Num(n=1)
+        else:
+            return node
+        
 
     def visit_Str(self, node):
         print("Visitor sees a string: ", ast.dump(node), " aka ", astor.to_source(node))
         # Note: some students may want: return ast.Str(s=481)
         
-        # num = random.randint(1,3)
-        # if num == 1:
-        #     return ast.Str(value="", kind=None)
-        # elif num == 2:
-        #     return ast.Str(value=node.s[1:], kind=None)
-        # else:
-        #     return node
+        str_count += 1
+        if str_count % 3 == 1:
+            return ast.Str(s="")
+        elif str_count % 3 == 2:
+            return ast.Str(s=node.s[1:])
+        else:
+            return node
         # Same, "" or 
-        return ast.Str(s='this')
     
     def visit_Compare(self, node):
         print("Visitor sees a comparison operator: ", ast.dump(node), " aka ", astor.to_source(node))
@@ -96,6 +103,7 @@ class MyVisitor(ast.NodeTransformer):
         # else:
         #     print("OldNode: ", astor.to_source(node))
         #     return node
+        compare_count += 1
         return ast.Compare(left=node.left, ops=[ast.Eq()], comparators=node.comparators)
     
     def visit_BinOp(self, node):
@@ -115,6 +123,7 @@ class MyVisitor(ast.NodeTransformer):
         # Randomly select one of the choices with equal probability
         newOp = random.choice(choices)
         
+        binOp_count += 1
         return ast.BinOp(left=node.left, op=newOp, right=node.right)
     
     def visit_BoolOp(self, node):
