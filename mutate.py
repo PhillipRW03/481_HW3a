@@ -58,14 +58,12 @@ class MyVisitor(ast.NodeTransformer):
             return node
         num = random.randint(1,10)
         if num == 1:
+            self.total_mutations += 1
             if self.num_count % 3 == 1:
-                self.total_mutations += 1
                 return ast.Num(n=0)
             elif self.num_count % 3 == 2:
-                self.total_mutations += 1
                 return ast.Num(n=-1)
             else:
-                self.total_mutations += 1
                 return ast.Num(n=1)
         else:
             return node
@@ -78,11 +76,10 @@ class MyVisitor(ast.NodeTransformer):
         self.str_count += 1
         num = random.randint(1,10)
         if num == 1:
+            self.total_mutations += 1
             if self.str_count % 2 == 1:
-                self.total_mutations += 1
                 return ast.Str(s="")
             else:
-                self.total_mutations += 1
                 return ast.Str(s=node.s[1:])
         else: 
             return node
@@ -186,7 +183,6 @@ for i in range(num_mutants):
     tree = MyVisitor().visit(tree)
     # Add lineno & col_offset to the nodes we created
     ast.fix_missing_locations(tree)
-    print(ast.dump(tree))
     print("Transformed code is: ", astor.to_source(tree))
     with open(output_name, 'w') as outputFile:
         outputFile.write(astor.to_source(tree))
