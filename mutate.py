@@ -34,6 +34,7 @@ class MyVisitor(ast.NodeTransformer):
         self.compare_count = 0
         self.binOp_count = 0
         self.boolOp_count = 0
+        self.total_mutations = 0
 
     """Notes all Numbers and all Strings. Replaces all numbers with 481 and
     strings with 'SE'."""
@@ -53,12 +54,21 @@ class MyVisitor(ast.NodeTransformer):
         
         # 0, -1, 1, or same
         self.num_count += 1
-        if self.num_count % 4 == 1:
-            return ast.Num(n=0)
-        elif self.num_count % 4 == 2:
-            return ast.Num(n=-1)
-        elif self.num_count % 4 == 3:
-            return ast.Num(n=1)
+        if self.total_mutations >= 2:
+            return node
+        num = random.randint(1,10)
+        if num == 1:
+            if self.num_count % 4 == 1:
+                self.total_mutations += 1
+                return ast.Num(n=0)
+            elif self.num_count % 4 == 2:
+                self.total_mutations += 1
+                return ast.Num(n=-1)
+            elif self.num_count % 4 == 3:
+                self.total_mutations += 1
+                return ast.Num(n=1)
+            else:
+                return node
         else:
             return node
         
@@ -68,11 +78,17 @@ class MyVisitor(ast.NodeTransformer):
         # Note: some students may want: return ast.Str(s=481)
         
         self.str_count += 1
-        if self.str_count % 3 == 1:
-            return ast.Str(s="")
-        elif self.str_count % 3 == 2:
-            return ast.Str(s=node.s[1:])
-        else:
+        num = random.randint(1,10)
+        if num == 1:
+            if self.str_count % 3 == 1:
+                self.total_mutations += 1
+                return ast.Str(s="")
+            elif self.str_count % 3 == 2:
+                self.total_mutations += 1
+                return ast.Str(s=node.s[1:])
+            else:
+                return node
+        else: 
             return node
         # Same, "" or 
     
@@ -80,56 +96,61 @@ class MyVisitor(ast.NodeTransformer):
         print("Visitor sees a comparison operator: ", ast.dump(node), " aka ", astor.to_source(node))
         # >, >=, ==, <=, <
         # 50% chance of negating comparison operator
-        # num = random.randint(1, 2)
-        # if num == 1:
-        #     if isinstance(node.ops[0], ast.Lt()):
-        #         print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.GtE()], comparators=node.comparators) ))
-        #         return ast.Compare(left=node.left, ops=[ast.GtE()], comparators=node.comparators)
-        #     elif isinstance(node.ops[0], ast.LtE()):
-        #         print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.Gt()], comparators=node.comparators) ))
-        #         return ast.Compare(left=node.left, ops=[ast.Gt()], comparators=node.comparators)
-        #     elif isinstance(node.ops[0], ast.Gt()):
-        #         print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.LtE()], comparators=node.comparators)))
-        #         return ast.Compare(left=node.left, ops=[ast.LtE()], comparators=node.comparators)
-        #     elif isinstance(node.ops[0], ast.GtE()):
-        #         print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.Lt()], comparators=node.comparators)))
-        #         return ast.Compare(left=node.left, ops=[ast.Lt()], comparators=node.comparators)
-        #     elif isinstance(node.ops[0], ast.Eq()):
-        #         print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.NotEq()], comparators=node.comparators)))
-        #         return ast.Compare(left=node.left, ops=[ast.NotEq()], comparators=node.comparators)
-        #     elif isinstance(node.ops[0], ast.NotEq()):
-        #         print("NewNode: ", astor.to_source(ast.Compare(left=node.left, ops=[ast.Eq()], comparators=node.comparators)))
-        #         return ast.Compare(left=node.left, ops=[ast.Eq()], comparators=node.comparators)
-        # else:
-        #     print("OldNode: ", astor.to_source(node))
-        #     return node
         self.compare_count += 1
-        return ast.Compare(left=node.left, ops=[ast.Eq()], comparators=node.comparators)
+        if self.total_mutations >= 2:
+            return node
+        num = random.randint(1,10)
+        if num == 1:
+            self.total_mutations += 1
+            if isinstance(node.ops[0], ast.Lt()):
+                return ast.Compare(left=node.left, ops=[ast.GtE()], comparators=node.comparators)
+            elif isinstance(node.ops[0], ast.LtE()):
+                return ast.Compare(left=node.left, ops=[ast.Gt()], comparators=node.comparators)
+            elif isinstance(node.ops[0], ast.Gt()):
+                return ast.Compare(left=node.left, ops=[ast.LtE()], comparators=node.comparators)
+            elif isinstance(node.ops[0], ast.GtE()):
+                return ast.Compare(left=node.left, ops=[ast.Lt()], comparators=node.comparators)
+            elif isinstance(node.ops[0], ast.Eq()):
+                return ast.Compare(left=node.left, ops=[ast.NotEq()], comparators=node.comparators)
+            elif isinstance(node.ops[0], ast.NotEq()):
+                return ast.Compare(left=node.left, ops=[ast.Eq()], comparators=node.comparators)
+        else:
+            return node
+
     
     def visit_BinOp(self, node):
         print("Visitor sees a binary operator: ", ast.dump(node), " aka ", astor.to_source(node))
         # + to -, * to //, + to *, - to //, leave the same 
-        self.binOp_count += 1
-        if isinstance(node.op, ast.Add):
-            choices = [ast.Sub(), ast.Mult(), ast.Add()]
-        elif isinstance(node.op, ast.Sub):
-            choices = [ast.Add(), ast.FloorDiv(), ast.Sub()]
-        elif isinstance(node.op, ast.Mult):
-            choices = [ast.FloorDiv(), ast.Add(), ast.Mult()]
-        elif isinstance(node.op, ast.FloorDiv):
-            choices = [ast.Sub(), ast.Mult(), ast.FloorDiv()]
-        else:
-            return node  # If not one of the above, return unchanged
         
-        newOp = random.choice(choices)
-        return ast.BinOp(left=node.left, op=newOp, right=node.right)
+        self.binOp_count += 1
+        if self.total_mutations >= 2:
+            return node
+        
+        num = random.randint(1,10)
+        if num == 1:
+            if isinstance(node.op, ast.Add):
+                choices = [ast.Sub(), ast.Mult()]
+            elif isinstance(node.op, ast.Sub):
+                choices = [ast.Add(), ast.FloorDiv()]
+            elif isinstance(node.op, ast.Mult):
+                choices = [ast.FloorDiv(), ast.Add()]
+            elif isinstance(node.op, ast.FloorDiv):
+                choices = [ast.Sub(), ast.Mult()]
+            else:
+                return node  # If not one of the above, return unchanged
+            newOp = random.choice(choices)
+            self.total_mutations += 1
+            return ast.BinOp(left=node.left, op=newOp, right=node.right)
+        else:
+            return node
     
     def visit_BoolOp(self, node):
         print("Visitor sees a boolean operator: ", ast.dump(node), " aka ", astor.to_source(node))
         # 50% chance of negating boolean statement, 50% chance of leaving statement alone
         self.boolOp_count += 1
-        num = random.randint(1, 2)
+        num = random.randint(1, 10)
         if num == 1:
+            self.total_mutations += 1
             if isinstance(node.op, ast.And):
                 return ast.BoolOp(op=ast.Or(), values=node.values)
             elif isinstance(node.op, ast.Or):
